@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"log"
 	"threedee/database"
 	"threedee/entity"
 )
@@ -16,13 +15,16 @@ func NewPrintRequestRepository() *PrintRequestRepository {
 	return &PrintRequestRepository{}
 }
 
-func (*PrintRequestRepository) GetAll() []*entity.PrintRequest {
-	db := database.NewPostgresql()
+func (*PrintRequestRepository) GetAll() ([]*entity.PrintRequest, error) {
+	db, err := database.NewPostgresql()
+	if err != nil {
+		return nil, err
+	}
 	defer db.Close()
 
 	rows, err := db.Query("select a.id, a.item_name, a.est_weight, a.est_filament_length, a.est_duration,	a.file_url,	a.requestor, a.status from tbl_m_3d_print_request a")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -40,20 +42,23 @@ func (*PrintRequestRepository) GetAll() []*entity.PrintRequest {
 			&item.Status,
 		)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		result = append(result, item)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return result
+	return result, nil
 }
 
 func (*PrintRequestRepository) GetById(id int) (*entity.PrintRequest, error) {
-	db := database.NewPostgresql()
+	db, err := database.NewPostgresql()
+	if err != nil {
+		return nil, err
+	}
 	defer db.Close()
 
 	rows, err := db.Query("select a.id, a.item_name, a.est_weight, a.est_filament_length, a.est_duration,	a.file_url,	a.requestor, a.status from tbl_m_3d_print_request a where a.id = $1", id)

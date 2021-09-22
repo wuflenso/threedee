@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq" // this very golang thing: we call db driver withut calling it
 )
 
-func NewPostgresql() *sql.DB {
+func NewPostgresql() (*sql.DB, error) {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -21,13 +21,13 @@ func NewPostgresql() *sql.DB {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return db
+	return db, nil
 }
