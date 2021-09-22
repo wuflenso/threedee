@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"threedee"
+
+	"github.com/subosito/gotenv"
 )
 
 /*
@@ -22,6 +24,11 @@ import (
  */
 
 func main() {
+	e := gotenv.Load()
+	if e != nil {
+		log.Println(e)
+	}
+
 	app := threedee.NewThreedee()
 	log.Println("Threedee service is ready to listen at port 3000")
 	err := http.ListenAndServe(":3000", app.Router)
