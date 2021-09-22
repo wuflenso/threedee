@@ -1,5 +1,5 @@
 # threedee
-This is my private repository to learn microservice in Go without frameworks (go packages like httprouter and cors are still included)
+This is my personal repository to learn microservice in Go without frameworks (go packages like httprouter and cors are still included)
 
 ## Helpful Non Vanilla Packages
 ### General
