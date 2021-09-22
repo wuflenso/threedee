@@ -26,7 +26,10 @@ func NewRequestHandler(repo *repository.PrintRequestRepository) *RequestHandler 
 
 // handle GET /requests
 func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) error {
-	data := h.Repo.GetAll()
+	data, err := h.Repo.GetAll()
+	if err != nil {
+		return response.WriteInternalServerError(w, err)
+	}
 	return response.WriteSuccess(w, data, "success")
 
 }
