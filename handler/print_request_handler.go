@@ -25,33 +25,33 @@ func NewRequestHandler(repo *repository.PrintRequestRepository) *RequestHandler 
 }
 
 // handle GET /requests
-func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) error {
+func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) (int, error) {
 	data, err := h.Repo.GetAll()
 	if len(data) == 0 {
-		return response.WriteNotFoundError(w, errors.New("no records found"))
+		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("no records found"))
 	}
 	if err != nil {
-		return response.WriteInternalServerError(w, err)
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
 	}
-	return response.WriteSuccess(w, data, "success")
+	return http.StatusOK, response.WriteSuccess(w, data, "success")
 
 }
 
 // handle GET /requests/:id
-func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprouter.Params) error {
+func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
 
 	id, err := strconv.Atoi(p.ByName("id"))
 	if err != nil {
-		return response.WriteBadRequestError(w, errors.New("id is not a number"))
+		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("id is not a number"))
 	}
 
 	data, err := h.Repo.GetById(id)
 	if err != nil {
-		return response.WriteInternalServerError(w, err)
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
 	}
 	if data.Id == 0 {
-		return response.WriteNotFoundError(w, errors.New("record not found"))
+		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
 	}
 
-	return response.WriteSuccess(w, data, "success")
+	return http.StatusOK, response.WriteSuccess(w, data, "success")
 }

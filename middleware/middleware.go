@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Handler func(w http.ResponseWriter, r *http.Request, params httprouter.Params) error
+type Handler func(w http.ResponseWriter, r *http.Request, params httprouter.Params) (int, error)
 
 func Middleware(handle Handler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
@@ -18,15 +18,9 @@ func Middleware(handle Handler) httprouter.Handle {
 
 		start := time.Now()
 		query := r.URL.Query()
-		/* body := []byte{}
-		if r.Body != nil {
-			defer r.Body.Close()
-			body, _ = ioutil.ReadAll(r.Body)
-			r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-		} */
 
 		// this executes the methods in handler!
-		err := handle(w, r, params)
+		code, err := handle(w, r, params)
 
 		elapsed := time.Since(start).Seconds() * 1000
 		elapsedStr := strconv.FormatFloat(elapsed, 'f', -1, 64)
@@ -37,7 +31,7 @@ func Middleware(handle Handler) httprouter.Handle {
 				"method": r.Method,
 				"path":   r.URL.Path,
 				"query":  query.Encode(),
-				//"body":   string(body),
+				"status": code,
 			}).Warning(err.Error()) // this is where the 'msg' comes from
 		} else {
 			log.WithFields(log.Fields{
@@ -45,7 +39,7 @@ func Middleware(handle Handler) httprouter.Handle {
 				"method": r.Method,
 				"path":   r.URL.Path,
 				"query":  query.Encode(),
-				// "body":   string(body),
+				"status": code,
 			}).Info("success")
 		}
 	}
