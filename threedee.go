@@ -2,7 +2,8 @@ package threedee
 
 import (
 	"net/http"
-	"threedee/service"
+	"threedee/handler"
+	m "threedee/middleware"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
@@ -32,9 +33,9 @@ func NewThreedee() *Threedee {
 
 	router := httprouter.New()
 
-	rh := service.NewRequestHandler()
-	router.GET("/requests", rh.Index)
-	router.GET("/requests/:id", rh.Show)
+	rh := handler.NewRequestHandler()
+	router.GET("/requests", m.Middleware(rh.Index))
+	router.GET("/requests/:id", m.Middleware(rh.Show))
 
 	return &Threedee{corsConfig.Handler(router)}
 }

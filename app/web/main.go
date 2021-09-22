@@ -17,8 +17,8 @@ import (
  * 3. Execute http.ListenAndServe to launch the server.
  *
  * Leave the main package simple. The objectives of main are to create the app Handler and
- * launch the server. Leave the routing inside threedee.go. Leave the logic/remote api call/
- * db data retrieval/modification in service directory.
+ * launch the server. Leave the routing inside threedee.go. Leave the logic in the handler files,
+ * db data retrieval/modification in repository directory.
  */
 
 func main() {
