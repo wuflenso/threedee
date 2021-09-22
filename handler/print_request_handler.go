@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"threedee/repository"
@@ -31,7 +30,6 @@ func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprou
 	if len(data) == 0 {
 		return response.WriteNotFoundError(w, errors.New("no records found"))
 	}
-	fmt.Println(data)
 	if err != nil {
 		return response.WriteInternalServerError(w, err)
 	}

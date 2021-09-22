@@ -22,7 +22,16 @@ func (*PrintRequestRepository) GetAll() ([]*entity.PrintRequest, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("select a.id, a.item_name, a.est_weight, a.est_filament_length, a.est_duration,	a.file_url,	a.requestor, a.status from tbl_m_3d_print_request a")
+	rows, err := db.Query("select " +
+		"a.id," +
+		"a.item_name," +
+		"a.est_weight," +
+		"a.est_filament_length," +
+		"a.est_duration," +
+		"a.file_url," +
+		"a.requestor," +
+		"a.status " +
+		"from tbl_m_3d_print_request a")
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +70,16 @@ func (*PrintRequestRepository) GetById(id int) (*entity.PrintRequest, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("select a.id, a.item_name, a.est_weight, a.est_filament_length, a.est_duration,	a.file_url,	a.requestor, a.status from tbl_m_3d_print_request a where a.id = $1", id)
+	rows, err := db.Query("select "+
+		"a.id,"+
+		"a.item_name,"+
+		"a.est_weight,"+
+		"a.est_filament_length,"+
+		"a.est_duration,"+
+		"a.file_url,"+
+		"a.requestor,"+
+		"a.status "+
+		"from tbl_m_3d_print_request a where a.id = $1", id)
 	if err != nil {
 		return nil, err
 	}
