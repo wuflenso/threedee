@@ -28,7 +28,7 @@ func WriteSuccess(w http.ResponseWriter, data interface{}, message string) error
 	return nil
 }
 
-func WriteError(w http.ResponseWriter, err error) error {
+func WriteInternalServerError(w http.ResponseWriter, err error) error {
 	meta := Meta{
 		Message:    err.Error(),
 		HttpStatus: http.StatusInternalServerError,
@@ -38,12 +38,22 @@ func WriteError(w http.ResponseWriter, err error) error {
 	return err
 }
 
-func WriteBadRequest(w http.ResponseWriter, err error) error {
+func WriteNotFoundError(w http.ResponseWriter, err error) error {
 	meta := Meta{
-		Message:    "Bad Request",
+		Message:    err.Error(),
+		HttpStatus: http.StatusNotFound,
+	}
+
+	Respond(w, meta, http.StatusNotFound)
+	return err
+}
+
+func WriteBadRequestError(w http.ResponseWriter, err error) error {
+	meta := Meta{
+		Message:    err.Error(),
 		HttpStatus: http.StatusBadRequest,
 	}
 
-	Respond(w, meta, http.StatusOK)
+	Respond(w, meta, http.StatusBadRequest)
 	return err
 }

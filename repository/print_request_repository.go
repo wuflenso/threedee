@@ -52,13 +52,13 @@ func (*PrintRequestRepository) GetAll() []*entity.PrintRequest {
 	return result
 }
 
-func (*PrintRequestRepository) GetById(id int) *entity.PrintRequest {
+func (*PrintRequestRepository) GetById(id int) (*entity.PrintRequest, error) {
 	db := database.NewPostgresql()
 	defer db.Close()
 
 	rows, err := db.Query("select a.id, a.item_name, a.est_weight, a.est_filament_length, a.est_duration,	a.file_url,	a.requestor, a.status from tbl_m_3d_print_request a where a.id = $1", id)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -75,13 +75,13 @@ func (*PrintRequestRepository) GetById(id int) *entity.PrintRequest {
 			&item.Status,
 		)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return item
+	return item, nil
 }

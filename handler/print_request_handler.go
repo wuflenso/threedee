@@ -36,9 +36,16 @@ func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprout
 
 	id, err := strconv.Atoi(p.ByName("id"))
 	if err != nil {
-		return response.WriteBadRequest(w, errors.New("id is not a number"))
+		return response.WriteBadRequestError(w, errors.New("id is not a number"))
 	}
 
-	data := h.Repo.GetById(id)
+	data, err := h.Repo.GetById(id)
+	if err != nil {
+		return response.WriteInternalServerError(w, err)
+	}
+	if data.Id == 0 {
+		return response.WriteNotFoundError(w, errors.New("record not found"))
+	}
+
 	return response.WriteSuccess(w, data, "success")
 }
