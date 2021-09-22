@@ -2,8 +2,8 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
+	"threedee/repository"
 	"threedee/utility/response"
 
 	"github.com/julienschmidt/httprouter"
@@ -15,16 +15,17 @@ import (
  * business usecases that might contain the business logic
  */
 
-type RequestHandler struct{}
+type RequestHandler struct {
+	Repo *repository.PrintRequestRepository
+}
 
-func NewRequestHandler() *RequestHandler {
-	return &RequestHandler{}
+func NewRequestHandler(repo *repository.PrintRequestRepository) *RequestHandler {
+	return &RequestHandler{repo}
 }
 
 // handle GET /requests
 func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) error {
-	fmt.Fprintf(w, "hallo")
-	data := "kosong"
+	data := h.Repo.GetAll()
 	return response.WriteSuccess(w, data, "success")
 
 }

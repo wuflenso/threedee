@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"threedee/handler"
 	m "threedee/middleware"
+	"threedee/repository"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
@@ -33,7 +34,8 @@ func NewThreedee() *Threedee {
 
 	router := httprouter.New()
 
-	rh := handler.NewRequestHandler()
+	rep := repository.NewPrintRequestRepository()
+	rh := handler.NewRequestHandler(rep)
 	router.GET("/requests", m.Middleware(rh.Index))
 	router.GET("/requests/:id", m.Middleware(rh.Show))
 
