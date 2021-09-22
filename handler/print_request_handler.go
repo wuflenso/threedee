@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"threedee/repository"
 	"threedee/utility/response"
 
@@ -32,5 +33,12 @@ func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprou
 
 // handle GET /requests/:id
 func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprouter.Params) error {
-	return response.WriteBadRequest(w, errors.New("kaco inputnya"))
+
+	id, err := strconv.Atoi(p.ByName("id"))
+	if err != nil {
+		return response.WriteBadRequest(w, errors.New("id is not a number"))
+	}
+
+	data := h.Repo.GetById(id)
+	return response.WriteSuccess(w, data, "success")
 }
