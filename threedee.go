@@ -36,8 +36,8 @@ func NewThreedee() *Threedee {
 
 	rep := repository.NewPrintRequestRepository()
 	rh := handler.NewRequestHandler(rep)
-	router.GET("/requests", m.Middleware(rh.Index))
-	router.GET("/requests/:id", m.Middleware(rh.Show))
+	router.GET("/print-requests", m.Middleware(rh.Index))
+	router.GET("/print-requests/:id", m.Middleware(rh.Show))
 
 	return &Threedee{corsConfig.Handler(router)}
 }
