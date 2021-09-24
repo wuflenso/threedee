@@ -5,6 +5,7 @@ import (
 	"threedee/handler"
 	m "threedee/middleware"
 	"threedee/repository"
+	"threedee/utility/normalizer"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
@@ -35,9 +36,11 @@ func NewThreedee() *Threedee {
 	router := httprouter.New()
 
 	rep := repository.NewPrintRequestRepository()
-	rh := handler.NewRequestHandler(rep)
+	norm := normalizer.NewPrintRequestNormalizer()
+	rh := handler.NewRequestHandler(rep, norm)
 	router.GET("/print-requests", m.Middleware(rh.Index))
 	router.GET("/print-requests/:id", m.Middleware(rh.Show))
+	router.POST("/print-requests", m.Middleware(rh.Create))
 
 	return &Threedee{corsConfig.Handler(router)}
 }

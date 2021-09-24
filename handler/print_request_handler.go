@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"threedee/repository"
+	"threedee/utility/normalizer"
 	"threedee/utility/response"
 
 	"github.com/julienschmidt/httprouter"
@@ -18,13 +19,14 @@ import (
 
 type RequestHandler struct {
 	Repo *repository.PrintRequestRepository
+	Norm *normalizer.PrintRequestNormalizer
 }
 
-func NewRequestHandler(repo *repository.PrintRequestRepository) *RequestHandler {
-	return &RequestHandler{repo}
+func NewRequestHandler(repo *repository.PrintRequestRepository, norm *normalizer.PrintRequestNormalizer) *RequestHandler {
+	return &RequestHandler{repo, norm}
 }
 
-// handle GET /requests
+// handle GET /print-requests
 func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) (int, error) {
 	data, err := h.Repo.GetAll()
 	if len(data) == 0 {
@@ -37,7 +39,7 @@ func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprou
 
 }
 
-// handle GET /requests/:id
+// handle GET /print-requests/:id
 func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
 
 	id, err := strconv.Atoi(p.ByName("id"))
@@ -51,6 +53,16 @@ func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprout
 	}
 	if data.Id == 0 {
 		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
+	}
+
+	return http.StatusOK, response.WriteSuccess(w, data, "success")
+}
+
+// handle POST /print-requests
+func (h *RequestHandler) Create(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+	data, err := h.Norm.ReadAndNormalize(w, r)
+	if err != nil {
+		return http.StatusBadRequest, response.WriteBadRequestError(w, err)
 	}
 
 	return http.StatusOK, response.WriteSuccess(w, data, "success")
