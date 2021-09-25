@@ -60,10 +60,20 @@ func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprout
 
 // handle POST /print-requests
 func (h *RequestHandler) Create(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
-	data, err := h.Norm.ReadAndNormalize(w, r)
+	model, err := h.Norm.ReadAndNormalize(w, r)
 	if err != nil {
 		return http.StatusBadRequest, response.WriteBadRequestError(w, err)
 	}
 
-	return http.StatusOK, response.WriteSuccess(w, data, "success")
+	id, err := h.Repo.Insert(model)
+	if err != nil {
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
+	}
+
+	model, err = h.Repo.GetById(id)
+	if err != nil {
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
+	}
+
+	return http.StatusOK, response.WriteSuccess(w, model, "success")
 }

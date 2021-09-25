@@ -108,3 +108,38 @@ func (*PrintRequestRepository) GetById(id int) (*entity.PrintRequest, error) {
 
 	return item, nil
 }
+
+func (*PrintRequestRepository) Insert(model *entity.PrintRequest) (int, error) {
+	db, err := database.NewPostgresql()
+	if err != nil {
+		return 0, err
+	}
+	defer db.Close()
+
+	var lastInsertId *int
+	err = db.QueryRow("INSERT INTO tbl_m_3d_print_request("+
+		"item_name,"+
+		"est_weight,"+
+		"est_filament_length,"+
+		"est_duration,"+
+		"file_url,"+
+		"requestor) "+
+		"VALUES "+
+		"($1,"+
+		"$2,"+
+		"$3,"+
+		"$4,"+
+		"$5,"+
+		"$6) "+
+		"RETURNING id;",
+		model.ItemName,
+		model.EstimatedWeight,
+		model.EstimatedFilamentLength,
+		model.EstimatedDuration,
+		model.FileUrl,
+		model.Requestor).Scan(&lastInsertId)
+	if err != nil {
+		return 0, err
+	}
+	return *lastInsertId, nil
+}
