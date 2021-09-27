@@ -50,3 +50,28 @@ To do:
 1. Create function to set modified_by by id
 2. Create trigger that accepts item id and calls the function above
 
+Create Function and Trigger
+
+```
+CREATE OR REPLACE FUNCTION before_update_3dpr() RETURNS trigger AS $before_update_3dpr$
+    BEGIN
+        -- Add modify fields
+        NEW.modified_on := now();
+
+	IF NEW.modified_by = NULL THEN
+            NEW.modified_by := 'system';
+	END IF;
+        RETURN NEW;
+    END;
+$before_update_3dpr$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_update_3dpr BEFORE UPDATE ON tbl_m_3d_print_request
+    FOR EACH ROW EXECUTE PROCEDURE before_update_3dpr();
+```
+
+Drop Trigger
+```
+DROP TRIGGER before_update_3dpr on tbl_m_3d_print_request;
+
+```
+
