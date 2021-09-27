@@ -35,6 +35,7 @@ func NewThreedee() *Threedee {
 
 	router := httprouter.New()
 
+	// We input the repo here, not the interface. The interface is for contraint purpose only
 	rep := repository.NewPrintRequestRepository()
 	norm := normalizer.NewPrintRequestNormalizer()
 	rh := handler.NewRequestHandler(rep, norm)

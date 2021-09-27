@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"threedee/repository"
+	print_request "threedee/interfaces/print-request"
 	"threedee/utility/normalizer"
 	"threedee/utility/response"
 
@@ -18,11 +18,11 @@ import (
  */
 
 type RequestHandler struct {
-	Repo *repository.PrintRequestRepository
+	Repo print_request.PrintRequestRepositoryInterface
 	Norm *normalizer.PrintRequestNormalizer
 }
 
-func NewRequestHandler(repo *repository.PrintRequestRepository, norm *normalizer.PrintRequestNormalizer) *RequestHandler {
+func NewRequestHandler(repo print_request.PrintRequestRepositoryInterface, norm *normalizer.PrintRequestNormalizer) *RequestHandler {
 	return &RequestHandler{repo, norm}
 }
 

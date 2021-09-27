@@ -143,3 +143,48 @@ func (*PrintRequestRepository) Insert(model *entity.PrintRequest) (int, error) {
 	}
 	return *lastInsertId, nil
 }
+
+func (*PrintRequestRepository) Update(model *entity.PrintRequest) (bool, error) {
+	db, err := database.NewPostgresql()
+	if err != nil {
+		return false, err
+	}
+	defer db.Close()
+
+	_, err = db.Query("UPDATE tbl_m_3d_print_request SET "+
+		"item_name = $1,"+
+		"est_weight = $2,"+
+		"est_filament_length = $3,"+
+		"est_duration = $4"+
+		"file_url = $5,"+
+		"requestor = $6 "+
+		"WHERE id = $7;",
+		model.ItemName,
+		model.EstimatedWeight,
+		model.EstimatedFilamentLength,
+		model.EstimatedDuration,
+		model.FileUrl,
+		model.Requestor,
+		model.Id)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (*PrintRequestRepository) Delete(id int) (bool, error) {
+	db, err := database.NewPostgresql()
+	if err != nil {
+		return false, err
+	}
+	defer db.Close()
+
+	_, err = db.Query("UPDATE tbl_m_3d_print_request SET "+
+		"is_active = false,"+
+		"WHERE id = $1;",
+		id)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
