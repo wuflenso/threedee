@@ -90,6 +90,17 @@ func (h *RequestHandler) Update(w http.ResponseWriter, r *http.Request, p httpro
 		return http.StatusBadRequest, response.WriteBadRequestError(w, err)
 	}
 
+	data, err := h.Repo.GetById(id)
+	if err != nil {
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
+	}
+	if data.Id == 0 {
+		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
+	}
+	if data.Status != "received" {
+		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("you can not edit a request that is already processed"))
+	}
+
 	model.Id = id
 	_, err = h.Repo.Update(model)
 	if err != nil {
@@ -112,4 +123,33 @@ func (h *RequestHandler) Delete(w http.ResponseWriter, r *http.Request, p httpro
 	}
 
 	return http.StatusOK, response.WriteSuccess(w, nil, "success")
+}
+
+// handle PUT /print-requests/:id/status
+func (h *RequestHandler) ChangeStatus(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+	id, err := strconv.Atoi(p.ByName("id"))
+	if err != nil {
+		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("id is not a number"))
+	}
+
+	model, err := h.Norm.ReadAndNormalize(w, r)
+	if err != nil {
+		return http.StatusBadRequest, response.WriteBadRequestError(w, err)
+	}
+
+	data, err := h.Repo.GetById(id)
+	if err != nil {
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
+	}
+	if data.Id == 0 {
+		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
+	}
+
+	data.Status = model.Status
+	_, err = h.Repo.Update(data)
+	if err != nil {
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
+	}
+
+	return http.StatusOK, response.WriteSuccess(w, model, "success")
 }
