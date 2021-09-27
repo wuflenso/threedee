@@ -155,16 +155,18 @@ func (*PrintRequestRepository) Update(model *entity.PrintRequest) (bool, error) 
 		"item_name = $1,"+
 		"est_weight = $2,"+
 		"est_filament_length = $3,"+
-		"est_duration = $4"+
+		"est_duration = $4,"+
 		"file_url = $5,"+
-		"requestor = $6 "+
-		"WHERE id = $7;",
+		"requestor = $6,"+
+		"status = $7 "+
+		"WHERE id = $8;",
 		model.ItemName,
 		model.EstimatedWeight,
 		model.EstimatedFilamentLength,
 		model.EstimatedDuration,
 		model.FileUrl,
 		model.Requestor,
+		model.Status,
 		model.Id)
 	if err != nil {
 		return false, err
@@ -180,7 +182,7 @@ func (*PrintRequestRepository) Delete(id int) (bool, error) {
 	defer db.Close()
 
 	_, err = db.Query("UPDATE tbl_m_3d_print_request SET "+
-		"is_active = false,"+
+		"is_active = false "+
 		"WHERE id = $1;",
 		id)
 	if err != nil {
