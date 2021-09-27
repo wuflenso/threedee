@@ -77,3 +77,39 @@ func (h *RequestHandler) Create(w http.ResponseWriter, r *http.Request, p httpro
 
 	return http.StatusOK, response.WriteSuccess(w, model, "success")
 }
+
+// handle PUT /print-requests/:id
+func (h *RequestHandler) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+	id, err := strconv.Atoi(p.ByName("id"))
+	if err != nil {
+		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("id is not a number"))
+	}
+
+	model, err := h.Norm.ReadAndNormalize(w, r)
+	if err != nil {
+		return http.StatusBadRequest, response.WriteBadRequestError(w, err)
+	}
+
+	model.Id = id
+	_, err = h.Repo.Update(model)
+	if err != nil {
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
+	}
+
+	return http.StatusOK, response.WriteSuccess(w, model, "success")
+}
+
+// handle DELETE /print-requests/:id
+func (h *RequestHandler) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+	id, err := strconv.Atoi(p.ByName("id"))
+	if err != nil {
+		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("id is not a number"))
+	}
+
+	_, err = h.Repo.Delete(id)
+	if err != nil {
+		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
+	}
+
+	return http.StatusOK, response.WriteSuccess(w, nil, "success")
+}
