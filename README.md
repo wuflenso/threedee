@@ -46,12 +46,8 @@ INSERT INTO tbl_m_3d_print_request(item_name,est_weight,est_filament_length,est_
 
 ### C. Note on modified_on and modified_by Fields
 These fields will be automatically updated by the system by default unless a db admin updates the data manually via psql query.
-To do:
-1. Create function to set modified_by by id
-2. Create trigger that accepts item id and calls the function above
 
 Create Function and Trigger
-
 ```
 CREATE OR REPLACE FUNCTION before_update_3dpr() RETURNS trigger AS $before_update_3dpr$
     BEGIN
@@ -72,6 +68,5 @@ CREATE TRIGGER before_update_3dpr BEFORE UPDATE ON tbl_m_3d_print_request
 Drop Trigger
 ```
 DROP TRIGGER before_update_3dpr on tbl_m_3d_print_request;
-
 ```
 
