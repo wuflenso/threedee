@@ -42,6 +42,8 @@ func NewThreedee() *Threedee {
 	router.GET("/print-requests", m.Middleware(rh.Index))
 	router.GET("/print-requests/:id", m.Middleware(rh.Show))
 	router.POST("/print-requests", m.Middleware(rh.Create))
+	router.PUT("/print-requests/:id", m.Middleware(rh.Update))
+	router.DELETE("/print-requests/:id", m.Middleware(rh.Delete))
 
 	return &Threedee{corsConfig.Handler(router)}
 }
