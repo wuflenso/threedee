@@ -1,5 +1,5 @@
 # threedee
-This is my personal repository to learn microservice in Go without frameworks (go packages like httprouter and cors are still included). Unit Test a la BL iamhot is added!
+This is my personal repository to learn microservice in Go without frameworks (go packages like httprouter and cors are still included). Unit Test is finally added!
 
 ## Helpful Non Vanilla Packages
 ### General
