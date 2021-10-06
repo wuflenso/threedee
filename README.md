@@ -13,6 +13,7 @@ This is my personal repository to learn microservice in Go without frameworks (g
 
 
 ## Create DB and Populate Initial Data in Postgresql
+Create a db in postgres with a name of `practicedb`.
 ### A. Create Table
 ```
 CREATE TABLE tbl_m_3d_print_request (
