@@ -25,6 +25,7 @@ import (
  * 3. Create TestMethod() that contains the testcases, input datas, mocking mechanisms, and
  *    endpoint call.
  * 4. Create the TestTestSuite function (is a must!)
+ * 5. execute "go test ./..." to test all the testable items
  *
  * If you mock a repo/service, create them under "testdata/mock" directory under package mock
  */
