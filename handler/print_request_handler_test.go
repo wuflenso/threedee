@@ -51,7 +51,7 @@ func (suite *PrintRequestHandlerTestSuite) TestIndex() {
 			isTimeout:    false,
 			isError:      true,
 			GetAllResult: nil,
-			GetAllError:  errors.New("[TEST] Failed to Retreive Data"),
+			GetAllError:  errors.New("[TEST] Failed to Retrieve Data"),
 		},
 		{
 			testcase:     "timeout",
