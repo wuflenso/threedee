@@ -12,13 +12,18 @@ import (
 )
 
 /*
- * SECOND LAYER => Threedee.go
- * This file is the second layer of the service. It's objective is to declare the Handler
- * item which in this case, "Threedee". This file contains instantiation of CORS and using
- * httprouter package to route endpoints easily.
+ * SECOND LAYER => Threedee.go or (whateverurappnameis).go
  *
- * endpoints usually route to files inside service directory which contains all the logic to handle
- * specific usecase. So, limit this file into routing and related configs like auth and database config.
+ * This file is the second layer of the service. It's objective is to route endpoints to
+ * corresponding handlers.
+ *
+ * This file contains instantiation of the app, which
+ * includes the declaration and instantiation of the services' parts like router, handler, repo,
+ * service, and supporting packages like CORS and httprouter.
+ *
+ * Endpoints usually route to handler package which contains all the logic to handle
+ * specific usecases. So, limit this threedee.go into routing and related configs like
+ * auth and database setup.
  */
 
 type Threedee struct {

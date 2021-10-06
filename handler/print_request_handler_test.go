@@ -16,14 +16,29 @@ import (
 	"github.com/subosito/gotenv"
 )
 
+/*
+ * Unit Testing HTTP Requests in Go
+ *
+ * UT must-haves:
+ * 1. Declare TestSuite struct including its parts (mock it if needed)
+ * 2. SetupTest() to instantiate the testsuite upon go test launch
+ * 3. Create TestMethod() that contains the testcases, input datas, mocking mechanisms, and
+ *    endpoint call.
+ * 4. Create the TestTestSuite function (is a must!)
+ *
+ * If you mock a repo/service, create them under "testdata/mock" directory under package mock
+ */
+
 var _ = gotenv.Load("../.env")
 
+// 1
 type PrintRequestHandlerTestSuite struct {
 	suite.Suite
 	mockPanelRepo   *mock.MockPrintRequestRepository
 	handlerInstance handler.RequestHandler
 }
 
+// 2
 func (suite *PrintRequestHandlerTestSuite) SetupTest() {
 	suite.mockPanelRepo = &mock.MockPrintRequestRepository{}
 	suite.handlerInstance = handler.RequestHandler{Repo: suite.mockPanelRepo, Norm: &normalizer.PrintRequestNormalizer{}}
@@ -31,6 +46,7 @@ func (suite *PrintRequestHandlerTestSuite) SetupTest() {
 
 //===============================================INDEX========================================================
 
+// 3
 func (suite *PrintRequestHandlerTestSuite) TestIndex() {
 	var testCase = []struct {
 		testcase     string
@@ -86,6 +102,7 @@ func (suite *PrintRequestHandlerTestSuite) TestIndex() {
 
 //===============================================TESTING========================================================
 
+// 4
 func TestPrintRequestHandlerTestSuite(t *testing.T) {
 	suite.Run(t, new(PrintRequestHandlerTestSuite))
 }

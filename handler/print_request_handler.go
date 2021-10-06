@@ -12,9 +12,17 @@ import (
 )
 
 /*
- * THIRD LAYER => All .go files in handler directory
+ * THIRD LAYER => Handler package
+ *
  * This file is the third layer of the service. It's objective is to handle specific
- * business usecases that might contain the business logic
+ * business usecases that might contain the business logic.
+ *
+ * Things we usually do in this layer is something like input normalizing,
+ * repo/service call, and input/output validations by calling helper packages.
+ *
+ * A handler utilizes either:
+ * a Repository (making requests to database), or
+ * a Service (making requests to other services i.e. using HTTP REST)
  */
 
 type RequestHandler struct {

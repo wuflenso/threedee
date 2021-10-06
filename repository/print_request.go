@@ -5,8 +5,7 @@ import (
 	"threedee/entity"
 )
 
-// Somehow at this point, we no longer play with pointers
-// is it because we dont modify that much?
+// This is the actual repository code that must follow the interface constraints.
 
 type PrintRequestRepository struct {
 }

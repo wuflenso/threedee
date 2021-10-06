@@ -15,12 +15,11 @@ import (
  * Steps to do here:
  * 1. Create an instance of the app that contains the http.Handler item that is needed by
  *    the Http.ListenAndServe method.
- * 2. Log the launch notif using log.Println
+ * 2. Log the launch notification using log.Println
  * 3. Execute http.ListenAndServe to launch the server.
  *
  * Leave the main package simple. The objectives of main are to create the app Handler and
- * launch the server. Leave the routing inside threedee.go. Leave the logic in the handler files,
- * db data retrieval/modification in repository directory.
+ * launch the server. Leave the endpoint routing inside threedee.go.
  */
 
 func main() {
