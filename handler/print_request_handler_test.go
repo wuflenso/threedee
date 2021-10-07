@@ -245,6 +245,94 @@ func (suite *PrintRequestHandlerTestSuite) TestCreate() {
 	}
 }
 
+//===============================================UPDATE========================================================
+
+func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
+	model := entity.PrintRequest{
+		ItemName:                "Bertaburan Bunga v2",
+		EstimatedWeight:         37.5,
+		EstimatedFilamentLength: 5000,
+		EstimatedDuration:       9000,
+		FileUrl:                 "http://drive.google.com/filez/100",
+		Requestor:               "Karim Hartono",
+	}
+	reqBodyBytes, _ := json.Marshal(model)
+
+	showModel := entity.PrintRequest{
+		Id:                      1,
+		ItemName:                "Bertaburan Bunga v2",
+		EstimatedWeight:         37.5,
+		EstimatedFilamentLength: 5000,
+		EstimatedDuration:       9000,
+		FileUrl:                 "http://drive.google.com/filez/100",
+		Requestor:               "Karim Hartono",
+	}
+
+	var testCase = []struct {
+		testcase     string
+		id           string
+		reqBody      []byte
+		isTimeout    bool
+		isError      bool
+		updateResult bool
+		updateError  error
+		showResult   *entity.PrintRequest
+	}{
+		{
+			testcase:     "success",
+			id:           "1",
+			reqBody:      reqBodyBytes,
+			isTimeout:    false,
+			isError:      false,
+			updateResult: true,
+			updateError:  nil,
+			showResult:   &showModel,
+		},
+		{
+			testcase:     "returns error",
+			id:           "1",
+			reqBody:      reqBodyBytes,
+			isTimeout:    false,
+			isError:      true,
+			updateResult: false,
+			updateError:  errors.New("[TEST] Failed to Insert Data"),
+			showResult:   &showModel,
+		},
+		{
+			testcase:     "timeout",
+			id:           "1",
+			reqBody:      reqBodyBytes,
+			isTimeout:    true,
+			isError:      true,
+			updateResult: false,
+			updateError:  nil,
+			showResult:   nil,
+		},
+	}
+	for _, tc := range testCase {
+		req, _ := http.NewRequest("PUT", "/print-requests/:id", strings.NewReader(string(tc.reqBody)))
+		req.Header.Add("Content-Type", "application/json")
+		responseRecorder := httptest.NewRecorder()
+		suite.mockPanelRepo.On("GetById", 1).Return(tc.showResult, nil).Times(1)
+		suite.mockPanelRepo.On("Update", &showModel).Return(tc.updateResult, tc.updateError).Times(1)
+
+		var err error
+		if tc.isTimeout {
+			ctx, cancel := context.WithTimeout(req.Context(), -7*time.Hour)
+			defer cancel()
+			_, err = suite.handlerInstance.Update(responseRecorder, req.WithContext(ctx), []httprouter.Param{{Key: "id", Value: tc.id}})
+		} else {
+			_, err = suite.handlerInstance.Update(responseRecorder, req, []httprouter.Param{{Key: "id", Value: tc.id}})
+		}
+
+		if tc.isError {
+			suite.NotNil(err)
+		} else {
+			suite.Nil(err)
+		}
+	}
+}
+
 //===============================================TESTING========================================================
 
 // 4

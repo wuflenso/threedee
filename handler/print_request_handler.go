@@ -136,7 +136,7 @@ func (h *RequestHandler) Update(w http.ResponseWriter, r *http.Request, p httpro
 	if data.Id == 0 {
 		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
 	}
-	if data.Status != "received" {
+	if data.Status == "processed" || data.Status == "finished" {
 		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("you can not edit a request that is already processed"))
 	}
 
