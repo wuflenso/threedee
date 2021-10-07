@@ -295,7 +295,7 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 			isTimeout:    false,
 			isError:      true,
 			updateResult: false,
-			updateError:  errors.New("[TEST] Failed to Insert Data"),
+			updateError:  errors.New("[TEST] Failed to Update Data"),
 			showResult:   &showModel,
 		},
 		{
@@ -323,6 +323,66 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 			_, err = suite.handlerInstance.Update(responseRecorder, req.WithContext(ctx), []httprouter.Param{{Key: "id", Value: tc.id}})
 		} else {
 			_, err = suite.handlerInstance.Update(responseRecorder, req, []httprouter.Param{{Key: "id", Value: tc.id}})
+		}
+
+		if tc.isError {
+			suite.NotNil(err)
+		} else {
+			suite.Nil(err)
+		}
+	}
+}
+
+//===============================================DELETE========================================================
+
+func (suite *PrintRequestHandlerTestSuite) TestDelete() {
+
+	var testCase = []struct {
+		testcase     string
+		id           string
+		isTimeout    bool
+		isError      bool
+		deleteResult bool
+		deleteError  error
+	}{
+		{
+			testcase:     "success",
+			id:           "1",
+			isTimeout:    false,
+			isError:      false,
+			deleteResult: true,
+			deleteError:  nil,
+		},
+		{
+			testcase:     "returns error",
+			id:           "1",
+			isTimeout:    false,
+			isError:      true,
+			deleteResult: false,
+			deleteError:  errors.New("[TEST] Failed to Delete Data"),
+		},
+		{
+			testcase:     "timeout",
+			id:           "1",
+			isTimeout:    true,
+			isError:      true,
+			deleteResult: false,
+			deleteError:  nil,
+		},
+	}
+	for _, tc := range testCase {
+		req, _ := http.NewRequest("DELETE", "/print-requests/:id", nil)
+		req.Header.Add("Content-Type", "application/json")
+		responseRecorder := httptest.NewRecorder()
+		suite.mockPanelRepo.On("Delete", 1).Return(tc.deleteResult, tc.deleteError).Times(1)
+
+		var err error
+		if tc.isTimeout {
+			ctx, cancel := context.WithTimeout(req.Context(), -7*time.Hour)
+			defer cancel()
+			_, err = suite.handlerInstance.Delete(responseRecorder, req.WithContext(ctx), []httprouter.Param{{Key: "id", Value: tc.id}})
+		} else {
+			_, err = suite.handlerInstance.Delete(responseRecorder, req, []httprouter.Param{{Key: "id", Value: tc.id}})
 		}
 
 		if tc.isError {
