@@ -217,7 +217,7 @@ func (suite *PrintRequestHandlerTestSuite) TestCreate() {
 			isTimeout:    true,
 			isError:      true,
 			createResult: 0,
-			createError:  errors.New("[TEST] Data Insertion Timed Out"),
+			createError:  nil,
 			showResult:   nil,
 		},
 	}

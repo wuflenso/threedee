@@ -36,6 +36,14 @@ func NewRequestHandler(repo print_request.PrintRequestRepositoryInterface, norm 
 
 // handle GET /print-requests
 func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) (int, error) {
+
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return http.StatusRequestTimeout, ctx.Err()
+	default:
+	}
+
 	data, err := h.Repo.GetAll()
 	if len(data) == 0 {
 		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("no records found"))
@@ -49,6 +57,13 @@ func (h *RequestHandler) Index(w http.ResponseWriter, r *http.Request, _ httprou
 
 // handle GET /print-requests/:id
 func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return http.StatusRequestTimeout, ctx.Err()
+	default:
+	}
 
 	id, err := strconv.Atoi(p.ByName("id"))
 	if err != nil {
@@ -68,6 +83,14 @@ func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprout
 
 // handle POST /print-requests
 func (h *RequestHandler) Create(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return http.StatusRequestTimeout, ctx.Err()
+	default:
+	}
+
 	model, err := h.Norm.ReadAndNormalize(w, r)
 	if err != nil {
 		return http.StatusBadRequest, response.WriteBadRequestError(w, err)
@@ -88,6 +111,14 @@ func (h *RequestHandler) Create(w http.ResponseWriter, r *http.Request, p httpro
 
 // handle PUT /print-requests/:id
 func (h *RequestHandler) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return http.StatusRequestTimeout, ctx.Err()
+	default:
+	}
+
 	id, err := strconv.Atoi(p.ByName("id"))
 	if err != nil {
 		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("id is not a number"))
@@ -120,6 +151,14 @@ func (h *RequestHandler) Update(w http.ResponseWriter, r *http.Request, p httpro
 
 // handle DELETE /print-requests/:id
 func (h *RequestHandler) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return http.StatusRequestTimeout, ctx.Err()
+	default:
+	}
+
 	id, err := strconv.Atoi(p.ByName("id"))
 	if err != nil {
 		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("id is not a number"))
@@ -135,6 +174,14 @@ func (h *RequestHandler) Delete(w http.ResponseWriter, r *http.Request, p httpro
 
 // handle PUT /print-requests/:id/status
 func (h *RequestHandler) ChangeStatus(w http.ResponseWriter, r *http.Request, p httprouter.Params) (int, error) {
+
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return http.StatusRequestTimeout, ctx.Err()
+	default:
+	}
+
 	id, err := strconv.Atoi(p.ByName("id"))
 	if err != nil {
 		return http.StatusBadRequest, response.WriteBadRequestError(w, errors.New("id is not a number"))
