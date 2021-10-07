@@ -59,7 +59,7 @@ func (h *RequestHandler) Show(w http.ResponseWriter, r *http.Request, p httprout
 	if err != nil {
 		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
 	}
-	if data.Id == 0 {
+	if data == nil || data.Id == 0 {
 		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
 	}
 

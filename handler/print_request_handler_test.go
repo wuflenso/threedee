@@ -12,6 +12,7 @@ import (
 	"threedee/utility/normalizer"
 	"time"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/suite"
 	"github.com/subosito/gotenv"
 )
@@ -53,36 +54,36 @@ func (suite *PrintRequestHandlerTestSuite) TestIndex() {
 		testcase     string
 		isTimeout    bool
 		isError      bool
-		GetAllResult []*entity.PrintRequest
-		GetAllError  error
+		getAllResult []*entity.PrintRequest
+		getAllError  error
 	}{
 		{
 			testcase:     "success",
 			isTimeout:    false,
 			isError:      false,
-			GetAllResult: []*entity.PrintRequest{entity.NewPrintRequest(), entity.NewPrintRequest()},
-			GetAllError:  nil,
+			getAllResult: []*entity.PrintRequest{entity.NewPrintRequest(), entity.NewPrintRequest()},
+			getAllError:  nil,
 		},
 		{
 			testcase:     "returns error",
 			isTimeout:    false,
 			isError:      true,
-			GetAllResult: nil,
-			GetAllError:  errors.New("[TEST] Failed to Retrieve Data"),
+			getAllResult: nil,
+			getAllError:  errors.New("[TEST] Failed to Retrieve Data"),
 		},
 		{
 			testcase:     "timeout",
 			isTimeout:    true,
 			isError:      true,
-			GetAllResult: nil,
-			GetAllError:  nil,
+			getAllResult: nil,
+			getAllError:  nil,
 		},
 	}
 	for _, tc := range testCase {
 		req, _ := http.NewRequest("GET", "/print-requests", nil)
 		req.Header.Add("Content-Type", "application/json")
 		responseRecorder := httptest.NewRecorder()
-		suite.mockPanelRepo.On("GetAll").Return(tc.GetAllResult, tc.GetAllError).Times(1)
+		suite.mockPanelRepo.On("GetAll").Return(tc.getAllResult, tc.getAllError).Times(1)
 
 		var err error
 		if tc.isTimeout {
@@ -91,6 +92,74 @@ func (suite *PrintRequestHandlerTestSuite) TestIndex() {
 			_, err = suite.handlerInstance.Index(responseRecorder, req.WithContext(ctx), nil)
 		} else {
 			_, err = suite.handlerInstance.Index(responseRecorder, req, nil)
+		}
+
+		if tc.isError {
+			suite.NotNil(err)
+		} else {
+			suite.Nil(err)
+		}
+	}
+}
+
+//===============================================INDEX========================================================
+
+// 3
+func (suite *PrintRequestHandlerTestSuite) TestShow() {
+	var testCase = []struct {
+		testcase   string
+		id         string
+		isTimeout  bool
+		isError    bool
+		showResult *entity.PrintRequest
+		showError  error
+	}{
+		{
+			testcase:   "success",
+			id:         "1",
+			isTimeout:  false,
+			isError:    false,
+			showResult: &entity.PrintRequest{Id: 1},
+			showError:  nil,
+		},
+		{
+			testcase:   "returns error",
+			id:         "1",
+			isTimeout:  false,
+			isError:    true,
+			showResult: nil,
+			showError:  errors.New("[TEST] Failed to Retrieve Data"),
+		},
+		{
+			testcase:   "timeout",
+			id:         "1",
+			isTimeout:  true,
+			isError:    true,
+			showResult: nil,
+			showError:  nil,
+		},
+		{
+			testcase:   "id is not a number",
+			id:         "a",
+			isTimeout:  false,
+			isError:    true,
+			showResult: nil,
+			showError:  nil,
+		},
+	}
+	for _, tc := range testCase {
+		req, _ := http.NewRequest("GET", "/print-requests/:id", nil)
+		req.Header.Add("Content-Type", "application/json")
+		responseRecorder := httptest.NewRecorder()
+		suite.mockPanelRepo.On("GetById", 1).Return(tc.showResult, tc.showError).Times(1)
+
+		var err error
+		if tc.isTimeout {
+			ctx, cancel := context.WithTimeout(req.Context(), -7*time.Hour)
+			defer cancel()
+			_, err = suite.handlerInstance.Show(responseRecorder, req.WithContext(ctx), []httprouter.Param{{Key: "id", Value: tc.id}})
+		} else {
+			_, err = suite.handlerInstance.Show(responseRecorder, req, []httprouter.Param{{Key: "id", Value: tc.id}})
 		}
 
 		if tc.isError {
