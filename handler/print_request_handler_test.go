@@ -102,9 +102,8 @@ func (suite *PrintRequestHandlerTestSuite) TestIndex() {
 	}
 }
 
-//===============================================INDEX========================================================
+//===============================================SHOW========================================================
 
-// 3
 func (suite *PrintRequestHandlerTestSuite) TestShow() {
 	var testCase = []struct {
 		testcase   string
