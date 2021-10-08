@@ -209,5 +209,5 @@ func (h *RequestHandler) ChangeStatus(w http.ResponseWriter, r *http.Request, p 
 		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
 	}
 
-	return http.StatusOK, response.WriteSuccess(w, model, "success")
+	return http.StatusOK, response.WriteSuccess(w, data, "success")
 }
