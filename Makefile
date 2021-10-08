@@ -2,3 +2,6 @@
 
 run:
 	go run app/web/main.go
+
+test:
+	go test ./...

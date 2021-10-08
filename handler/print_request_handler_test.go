@@ -258,18 +258,20 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 	}
 	reqBodyBytes, _ := json.Marshal(model)
 
-	showModelProcessed := entity.PrintRequest{
-		Id:                      1,
-		ItemName:                "Bertaburan Bunga v10",
-		EstimatedWeight:         37.5,
-		EstimatedFilamentLength: 5000,
-		EstimatedDuration:       9000,
-		FileUrl:                 "http://drive.google.com/filez/100",
-		Requestor:               "Karim Hartono",
-		Status:                  "processed",
+	showModelReceived := entity.PrintRequest{
+		Id:     1,
+		Status: "received",
 	}
 
-	showModel := entity.PrintRequest{
+	showModelProcessed := entity.PrintRequest{
+		Status: "processed",
+	}
+
+	showModelFinished := entity.PrintRequest{
+		Status: "finished",
+	}
+
+	expectedModel := entity.PrintRequest{
 		Id:                      1,
 		ItemName:                "Bertaburan Bunga v2",
 		EstimatedWeight:         37.5,
@@ -287,7 +289,6 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 		isError      bool
 		updateResult bool
 		updateError  error
-		showResult   *entity.PrintRequest
 	}{
 		{
 			testcase:     "success",
@@ -297,7 +298,6 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 			isError:      false,
 			updateResult: true,
 			updateError:  nil,
-			showResult:   &showModel,
 		},
 		{
 			testcase:     "returns error",
@@ -307,7 +307,6 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 			isError:      true,
 			updateResult: false,
 			updateError:  errors.New("[TEST] Failed to update data"),
-			showResult:   &showModel,
 		},
 		{
 			testcase:     "timeout",
@@ -317,25 +316,34 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 			isError:      true,
 			updateResult: false,
 			updateError:  nil,
-			showResult:   nil,
 		},
 		{
-			testcase:     "error when already processed",
-			id:           "1",
+			testcase:     "error when status already processed",
+			id:           "2",
 			reqBody:      reqBodyBytes,
 			isTimeout:    false,
 			isError:      true,
 			updateResult: false,
 			updateError:  nil,
-			showResult:   &showModelProcessed,
+		},
+		{
+			testcase:     "error when status already finished",
+			id:           "3",
+			reqBody:      reqBodyBytes,
+			isTimeout:    false,
+			isError:      true,
+			updateResult: false,
+			updateError:  nil,
 		},
 	}
 	for _, tc := range testCase {
 		req, _ := http.NewRequest("PUT", "/print-requests/:id", strings.NewReader(string(tc.reqBody)))
 		req.Header.Add("Content-Type", "application/json")
 		responseRecorder := httptest.NewRecorder()
-		suite.mockPanelRepo.On("GetById", 1).Return(tc.showResult, nil).Times(1)
-		suite.mockPanelRepo.On("Update", &showModel).Return(tc.updateResult, tc.updateError).Times(1)
+		suite.mockPanelRepo.On("GetById", 1).Return(&showModelReceived, nil).Times(1)
+		suite.mockPanelRepo.On("GetById", 2).Return(&showModelProcessed, nil).Times(1)
+		suite.mockPanelRepo.On("GetById", 3).Return(&showModelFinished, nil).Times(1)
+		suite.mockPanelRepo.On("Update", &expectedModel).Return(tc.updateResult, tc.updateError).Times(1)
 
 		var err error
 		if tc.isTimeout {
