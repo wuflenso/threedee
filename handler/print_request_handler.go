@@ -105,6 +105,9 @@ func (h *RequestHandler) Create(w http.ResponseWriter, r *http.Request, p httpro
 	if err != nil {
 		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
 	}
+	if model == nil || model.Id == 0 {
+		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
+	}
 
 	return http.StatusOK, response.WriteSuccess(w, model, "success")
 }
@@ -133,7 +136,7 @@ func (h *RequestHandler) Update(w http.ResponseWriter, r *http.Request, p httpro
 	if err != nil {
 		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
 	}
-	if data.Id == 0 {
+	if data == nil || data.Id == 0 {
 		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
 	}
 	if data.Status == "processed" || data.Status == "finished" {
@@ -196,7 +199,7 @@ func (h *RequestHandler) ChangeStatus(w http.ResponseWriter, r *http.Request, p 
 	if err != nil {
 		return http.StatusInternalServerError, response.WriteInternalServerError(w, err)
 	}
-	if data.Id == 0 {
+	if data == nil || data.Id == 0 {
 		return http.StatusNotFound, response.WriteNotFoundError(w, errors.New("record not found"))
 	}
 

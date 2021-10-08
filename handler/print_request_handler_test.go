@@ -71,7 +71,7 @@ func (suite *PrintRequestHandlerTestSuite) TestIndex() {
 			isTimeout:    false,
 			isError:      true,
 			getAllResult: nil,
-			getAllError:  errors.New("[TEST] Failed to Retrieve Data"),
+			getAllError:  errors.New("[TEST] Failed to retrieve data"),
 		},
 		{
 			testcase:     "timeout",
@@ -129,7 +129,7 @@ func (suite *PrintRequestHandlerTestSuite) TestShow() {
 			isTimeout:  false,
 			isError:    true,
 			showResult: nil,
-			showError:  errors.New("[TEST] Failed to Retrieve Data"),
+			showError:  errors.New("[TEST] Failed to retrieve data"),
 		},
 		{
 			testcase:   "timeout",
@@ -208,7 +208,7 @@ func (suite *PrintRequestHandlerTestSuite) TestCreate() {
 			isTimeout:    false,
 			isError:      true,
 			createResult: 0,
-			createError:  errors.New("[TEST] Failed to Insert Data"),
+			createError:  errors.New("[TEST] Failed to insert data"),
 			showResult:   nil,
 		},
 		{
@@ -258,6 +258,17 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 	}
 	reqBodyBytes, _ := json.Marshal(model)
 
+	showModelProcessed := entity.PrintRequest{
+		Id:                      1,
+		ItemName:                "Bertaburan Bunga v10",
+		EstimatedWeight:         37.5,
+		EstimatedFilamentLength: 5000,
+		EstimatedDuration:       9000,
+		FileUrl:                 "http://drive.google.com/filez/100",
+		Requestor:               "Karim Hartono",
+		Status:                  "processed",
+	}
+
 	showModel := entity.PrintRequest{
 		Id:                      1,
 		ItemName:                "Bertaburan Bunga v2",
@@ -295,7 +306,7 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 			isTimeout:    false,
 			isError:      true,
 			updateResult: false,
-			updateError:  errors.New("[TEST] Failed to Update Data"),
+			updateError:  errors.New("[TEST] Failed to update data"),
 			showResult:   &showModel,
 		},
 		{
@@ -307,6 +318,16 @@ func (suite *PrintRequestHandlerTestSuite) TestUpdate() {
 			updateResult: false,
 			updateError:  nil,
 			showResult:   nil,
+		},
+		{
+			testcase:     "error when already processed",
+			id:           "1",
+			reqBody:      reqBodyBytes,
+			isTimeout:    false,
+			isError:      true,
+			updateResult: false,
+			updateError:  nil,
+			showResult:   &showModelProcessed,
 		},
 	}
 	for _, tc := range testCase {
@@ -359,7 +380,7 @@ func (suite *PrintRequestHandlerTestSuite) TestDelete() {
 			isTimeout:    false,
 			isError:      true,
 			deleteResult: false,
-			deleteError:  errors.New("[TEST] Failed to Delete Data"),
+			deleteError:  errors.New("[TEST] Failed to delete data"),
 		},
 		{
 			testcase:     "timeout",
@@ -383,6 +404,101 @@ func (suite *PrintRequestHandlerTestSuite) TestDelete() {
 			_, err = suite.handlerInstance.Delete(responseRecorder, req.WithContext(ctx), []httprouter.Param{{Key: "id", Value: tc.id}})
 		} else {
 			_, err = suite.handlerInstance.Delete(responseRecorder, req, []httprouter.Param{{Key: "id", Value: tc.id}})
+		}
+
+		if tc.isError {
+			suite.NotNil(err)
+		} else {
+			suite.Nil(err)
+		}
+	}
+}
+
+//===============================================CHANGESTATUS========================================================
+
+func (suite *PrintRequestHandlerTestSuite) TestChangeStatus() {
+	modelProcessed := entity.PrintRequest{
+		Status: "processed",
+	}
+	reqBodyBytesProcessed, _ := json.Marshal(modelProcessed)
+
+	showModelReceived := entity.PrintRequest{
+		Id:                      1,
+		ItemName:                "Bertaburan Bunga v2",
+		EstimatedWeight:         37.5,
+		EstimatedFilamentLength: 5000,
+		EstimatedDuration:       9000,
+		FileUrl:                 "http://drive.google.com/filez/100",
+		Requestor:               "Karim Hartono",
+		Status:                  "received",
+	}
+
+	expectedModelProcessed := entity.PrintRequest{
+		Id:                      1,
+		ItemName:                "Bertaburan Bunga v2",
+		EstimatedWeight:         37.5,
+		EstimatedFilamentLength: 5000,
+		EstimatedDuration:       9000,
+		FileUrl:                 "http://drive.google.com/filez/100",
+		Requestor:               "Karim Hartono",
+		Status:                  "processed",
+	}
+
+	var testCase = []struct {
+		testcase           string
+		id                 string
+		reqBody            []byte
+		isTimeout          bool
+		isError            bool
+		changeStatusResult bool
+		changeStatusError  error
+		showResult         *entity.PrintRequest
+	}{
+		{
+			testcase:           "success",
+			id:                 "1",
+			reqBody:            reqBodyBytesProcessed,
+			isTimeout:          false,
+			isError:            false,
+			changeStatusResult: true,
+			changeStatusError:  nil,
+			showResult:         &showModelReceived,
+		},
+		{
+			testcase:           "returns error",
+			id:                 "1",
+			reqBody:            reqBodyBytesProcessed,
+			isTimeout:          false,
+			isError:            true,
+			changeStatusResult: false,
+			changeStatusError:  errors.New("[TEST] Failed to change status"),
+			showResult:         &showModelReceived,
+		},
+		{
+			testcase:           "timeout",
+			id:                 "1",
+			reqBody:            reqBodyBytesProcessed,
+			isTimeout:          true,
+			isError:            true,
+			changeStatusResult: false,
+			changeStatusError:  nil,
+			showResult:         nil,
+		},
+	}
+	for _, tc := range testCase {
+		req, _ := http.NewRequest("PUT", "/print-requests/:id/status", strings.NewReader(string(tc.reqBody)))
+		req.Header.Add("Content-Type", "application/json")
+		responseRecorder := httptest.NewRecorder()
+		suite.mockPanelRepo.On("GetById", 1).Return(tc.showResult, nil).Times(1)
+		suite.mockPanelRepo.On("Update", &expectedModelProcessed).Return(tc.changeStatusResult, tc.changeStatusError).Times(1)
+
+		var err error
+		if tc.isTimeout {
+			ctx, cancel := context.WithTimeout(req.Context(), -7*time.Hour)
+			defer cancel()
+			_, err = suite.handlerInstance.ChangeStatus(responseRecorder, req.WithContext(ctx), []httprouter.Param{{Key: "id", Value: tc.id}})
+		} else {
+			_, err = suite.handlerInstance.ChangeStatus(responseRecorder, req, []httprouter.Param{{Key: "id", Value: tc.id}})
 		}
 
 		if tc.isError {
